@@ -16,3 +16,60 @@ The JONSWAP spectrum is defined as
 \end{equation}
 \end{subequations}
 where \cref{eq:JONSWAPSpec} defines the power spectrum and \cref{eq:JONSWAPparam} defines the suggested scalar parameters given in the slides. Here, $H_s$ is the significant wave height, $f_p$ is the frequency corresponding to the peak period (i.e. $f_p=1/T_p$), $f$ is the frequency of interest, $\gamma$ is the so-called peak enchancement factor and $\alpha$, $\beta$, $\sigma$ are scalar parameters describing the shape of the JONSWAP spectrum.
+
+\begin{figure}[h!]
+\begin{subfigure}[t]{.9\textwidth}
+\centering
+\begin{tikzpicture}
+\pgfplotsset{set layers}
+\begin{axis}[
+	width = .50\linewidth,
+	height = .35\linewidth,
+	xmin = 0, xmax = 0.016,
+	ymin = -5, ymax = 25,
+	grid = both,
+	scale only axis,
+    axis y line*=left,
+	xlabel = Square of element size: $h^2$ \si{[m^2]},
+	ylabel style={align=center}, ylabel= Pressure: $p$ \si{[Pa]} or \\ Energy dissipation: $\Phi$ \si{[W/m]},
+	minor tick num = 0,
+	major grid style = {lightgray},
+	minor grid style = {lightgray!25},
+	legend cell align = {left},
+	legend pos = south west,
+    cycle list name=LineStyles,
+    every x tick scale label/.style={
+    at={(.9,0)},yshift=-28pt,anchor=south west,inner sep=0pt},
+]
+\addplot [black, solid, mark = *,mark options={fill=white, scale=0.7}] table {Figures/PlotData/convpoisback_pa.dat};
+\addplot [black, solid, mark = triangle*,mark options={fill=white, scale=0.9}] table {Figures/PlotData/convpoisback_pb.dat};
+\addplot [black, dashed, mark = *,mark options={solid, fill=white, scale=0.7}] table {Figures/PlotData/convpoisback_phi.dat};
+\legend{
+	{\footnotesize $p_\text{A}(h^2)$},
+	{\footnotesize $p_\text{B}(h^2)$},
+	 {\footnotesize $\Phi(h^2)$},
+	 }
+\end{axis}
+\begin{axis}[
+	width = .50\linewidth,
+	height = .35\linewidth,
+    scale only axis,
+	xmin = 0, xmax = 0.016,
+    ymin = 0.4, ymax = .6,
+	axis y line* =right,
+	axis x line = none,
+	legend pos = south east,
+	ylabel = Horizontal velocity: $u_x$ \si{[m/s]}
+]
+\addplot [black, dotted, mark = *,mark options={solid, fill=white, scale=0.7}] table {Figures/PlotData/convpoisback_uxa.dat};
+\addplot [black, dotted, mark = triangle*,mark options={solid, fill=white, scale=0.9}] table {Figures/PlotData/convpoisback_uxb.dat};
+\legend{
+     {\footnotesize $u_{x,\text{A}}(h^2)$},
+     {\footnotesize $u_{x,\text{B}}(h^2)$},
+}
+\end{axis}
+\end{tikzpicture}
+\caption{Quantitative convergence analysis of pressure $p$, horizontal velocity, $u_x$, and energy dissipation, $\Phi$. }
+\label{fig:convpoisbackfig}
+\end{subfigure}
+\end{figure}
