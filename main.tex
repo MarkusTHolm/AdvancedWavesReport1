@@ -1,0 +1,28 @@
+\documentclass[a4paper,twoside,12pt]{report} %openright
+\input{Setup/Statics.tex}
+\input{Setup/Preamble.tex}
+\input{Setup/Settings.tex}
+
+\begin{document}
+
+\pagenumbering{roman}
+\input{Frontmatter/Frontpage.tex}
+\pagecolor{white}
+\newgeometry{top=3cm, bottom=3cm, outer=2cm, inner=2cm}
+% \pagestyle{empty}
+% \input{Frontmatter/Abstract.tex}
+\tableofcontents
+\clearpage
+
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\clearpage
+\input{Chapters/01_Assignment1}
+
+
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \printbibliography[heading=bibintoc,title={References}]
+\cleardoublepage 
+\appendix
+% \input{Backmatter/Appendix}
+\end{document}
