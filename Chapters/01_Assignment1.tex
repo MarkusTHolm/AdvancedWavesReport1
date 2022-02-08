@@ -17,34 +17,9 @@ The JONSWAP spectrum is defined as
 \end{subequations}
 where \cref{eq:JONSWAPSpec} defines the power spectrum and \cref{eq:JONSWAPparam} defines the suggested scalar parameters given in the slides. Here, $H_s$ is the significant wave height, $f_p$ is the frequency corresponding to the peak period (i.e. $f_p=1/T_p$), $f$ is the frequency of interest, $\gamma$ is the so-called peak enchancement factor and $\alpha$, $\beta$, $\sigma$ are scalar parameters describing the shape of the JONSWAP spectrum.
 
-\begin{figure}[h!]
-\begin{subfigure}[b]{.5\textwidth}
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-	width = .9\linewidth,
-	height = .65\linewidth,
-	xmin = 0, xmax = 0.02,
-	ymin = -3, ymax = 0,
-	grid = both,
-	xlabel = Square of element size: $h^2$ \si{[m^2]},
-	ylabel style={align=center}, 
-	ylabel = Normalized net mass flow: \\ $\dot{m}_{\text{net}}/\dot{m}_{\text{in}}$ \si{[\percent]} ,
-	minor tick num = 0,
-	major grid style = {lightgray},
-	minor grid style = {lightgray!25},
-	legend cell align = {left},
-	legend pos = north east,
-    cycle list name=BlackWhite,
-    every x tick scale label/.style={
-    at={(1,-0.2)},xshift=0pt,anchor=south west,inner sep=0pt}
-]
-\addplot table [black, solid, mark = *,mark options={fill=white, scale=0.7}]{Figures/Plotdata/JONSWAPres.dat};
-\legend{
-        $\dot{m}_{\text{net}}/\dot{m}_{\text{in}}(h^2)$}
-\end{axis}
-\end{tikzpicture}
-\caption{ }
-\label{fig:MassConvplot}
-\end{subfigure}%
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{}
+    \caption{Caption}
+    \label{fig:my_label}
 \end{figure}
