@@ -102,20 +102,27 @@ which evaluates to $m_0=\SI{2.84}{m^2}$ when applying the discrete formulation t
 \end{enumerate}
 The significant wave height from the zero-down crossing analysis is then found by computing the mean of the 2/3 quantile, $q_{0.667}$, of the obtained zero down crossing wave heights. This results in a significant wave height of $H_s^{zdc}=\SI{6.56}{m}$, which gives a relative deviation of $\SI{-2.8}{\percent}$ from the input significant wave height (\cref{tab:Modelparameters}). \textcolor{red}{DISCUSS?}
 
-\paragraph{2.d)}
+\paragraph{2.d)} \Cref{fig:etaIFFTDistributions} illustrates the empirical distribution of the generated surface elevations (\cref{fig:SurfaceElevation}). \Cref{fig:etaIFFTHist} compares the empirical probalility density function with the equivalent normal distribution (based on the sample mean and sample variance), and \Cref{fig:etaIFFTqqplot} is a quantile-quantile plot (Q-Q plot) of the surface elevations versus the standard normal distribution. The figures generally illustrates good agreement with the expected normally distributed surface elevations. However, it is observed that there are some deviations from normality at the tails of the distribution (\cref{fig:etaIFFTqqplot}).\textcolor{red}{WHY does the surface elevation follow a normal distribution}. 
+
+To evaluate the distribution quantitatively, the skewness, $s_k$, and kurtosis, $k_u$, are computed and compared to the expected values for a normal distribution, i.e. $s_k=0$, and $k_u=3$. The skewness and kurtosis for the continuous case can be defined as
+\begin{equation}
+    s_k = \frac{1}{\sigma^3}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^3 \dif t, \quad k_u = \frac{1}{\sigma^4}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^4 \dif t.
+\end{equation}
+where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the variance of the surface elevation. Computing the skewness and kurtosis yields $s_k=-0.02$ and $k_u=2.92$, respectively. Thus, surface elevation again seems to approximately follow a normal distribution.
 
 \begin{figure}[htb]
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=1\textwidth,trim=0cm 0cm 0.0cm 0cm, clip=true]{Figures/Plots/etaIFFTdist}
     \caption{Empirical probability density function}
-    \label{fig:MechanicalModel}
+    \label{fig:etaIFFTHist}
 \end{subfigure}%
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth,trim=0cm 0cm 0cm 0cm, clip=true]{Figures/Plots/etaIFFqqplot}
-    \caption{QQ plot of surface elevations versus standard normal}
-    \label{fig:MechanicalModelFBD}
+    \caption{Q-Q plot of surface elevations versus standard normal}
+    \label{fig:etaIFFTqqplot}
 \end{subfigure}
-\caption{Emperical distribution of the surface elevations shown in \cref{fig:SurfaceElevation}.}
+\caption{Empirical distribution of the generated surface elevations, $\eta$, shown in \cref{fig:SurfaceElevation}.}
+\label{fig:etaIFFTDistributions}
 \end{figure}
