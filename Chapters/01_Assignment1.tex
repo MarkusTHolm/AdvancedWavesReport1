@@ -29,7 +29,7 @@ here $a_n$ and $b_n$ are the unknown Fourier coefficients, and $\omega_n$, $T_n$
     \eta(t,x) = \sum_{n=1}^{n_{\text{max}}} c_n e^{-i(\omega_n t-k_n x)} + \Tilde{c}_n e^{i(\omega_n t - k_n x)}, \quad \text{where }c_n=\frac{1}{2}(a_n+i b_n) \ \text{and} \ \Tilde{c}_n=\frac{1}{2}(a_n-i b_n)
     \label{eq:ComplexFourier}
 \end{equation}
-which also shows the conversion between the real and complex Fourier coefficients. Note that the actual wave surface elevation is the real part of the above complex representation. Here the tilde $[\, \Tilde{\text{\scalebox{0.5}{\textbullet}}}\,]$ denotes the complex conjugate.
+which is valid as the function wave function, $\eta$, only has physical meaning for real values, i.e. $c_{-n}=\Tilde{c}_n$. \cref{eq:ComplexFourier} also shows the conversion between the real and complex Fourier coefficients. Note that the actual wave surface elevation is the real part of the above complex representation, and that the tilde $[\, \Tilde{\text{\scalebox{0.5}{\textbullet}}}\,]$ denotes the complex conjugate.
 
 \begin{table}[h]
     \centering
@@ -61,11 +61,60 @@ The third step is to determine the complex conjugate pair of Fourier coefficient
 \end{equation}
 and then converting $\{a_n,\ b_n \}$ (using \cref{eq:ComplexFourier}) to the paired complex coefficients, $\{c_n,\ \Tilde{c}_n\}$.
 
-The fourth step introduces a clever computational/theoretical trick, so it requires a short explanation. First, it is noticed that the  
-
+The fourth step is more easily understood when first introducing a new coefficient, $d_n$, such that \cref{eq:ComplexFourier} can be written as
+\begin{equation}
+        \eta(t,x) = \sum_{n=1}^{n_{\text{max}}} d_n e^{-i\omega_n t} + \Tilde{d}_n e^{i\omega_n t}
+    \label{eq:ComplexFourier2}, \quad d_n = c_n e^{ik_n x}, \qquad \Tilde{d}_n = \Tilde{c}_n e^{-ik_n x}.
+\end{equation}
+which is exactly what the Inverse Discrete Fourier Transform (IDFT) computes for a set of data points in a large matrix multiplication, requiring $O(n^2)$ multiplication operations. However, the computational efficiency can be greatly improved by using the Inverse Fast Fourier Transform (IFFT) that only requires $O(n\log{(n)})$ multiplication operations.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{Figures/Plots/SurfaceElevation.eps}
-    \caption{Caption}
-    \label{fig:my_label}
+    \caption{Free surface elevation as a function of time}
+    \label{fig:SurfaceElevation}
+\end{figure}
+
+Thus, the fourth step revolves around arranging the Fourier coefficients in the correct order for the MATLAB IFFT algorithm, \verb+ifft()+. As previously mentioned, the desired discrete surface elevation function must only contain real values, making the coefficients conjugate symmetric ($c_{-n}=\Tilde{c}_n$). Thus, the coefficients, $d_n$, are also conjugate symmetric, and MATLAB requires the input vector to the \verb+ifft()+ function (here denoted $d_{FFT}^\eta$) to be stored in a \textit{wrap-around} order in the vector, such as
+\begin{equation}
+    d_{FFT}^\eta = [\, \Bar{\eta}\ d_1\ d_2\ \dots \ d_{(N_{Nyq}-1)} \ d_{N_{Nyq}} \ \Tilde{d}_{N_{Nyq}} \ \Tilde{d}_{(N_{Nyq}-1)} \ \dots \  \Tilde{d}_2 \ \Tilde{d}_1 \ \Bar{\eta} \, ], 
+    \label{eq:dfftvector}
+\end{equation} 
+here $\Bar{\eta}$ is the mean wave height (set to zero) and $N_{Nyq}$ is the index of the Nyquist frequiency, $f_{Nyq}$. Finally, inserting the vector, $d_{FFT}^\eta$, into the \verb+ifft()+ function with the \verb+symmetric+ option enabled results in the surface elevation time series illustrated in \cref{fig:SurfaceElevation}. 
+
+\vspace{15mm}
+{\let\clearpage\relax \chapter{Analyzing the implementation}}
+
+The purpose of the present section is to analyze the wave series generated from the wave characteristics and the JONSWAP spectrum (\cref{fig:SurfaceElevation}), with the goal of validating the implementation. The analysis is split into small steps following the order given in the problem description.
+
+\paragraph{2.a)} The zero-moment of the spectral description is presented below in both a continuous and discrete from as
+\begin{equation}
+    m_0 = \int_0^\infty S_{\eta \eta}(f) \dif f, \qquad m_0 = \sum_{n=1}^{n_{max}} S_{\eta\eta}(f)\,df,
+\end{equation}
+which evaluates to $m_0=\SI{2.84}{m^2}$ when applying the discrete formulation to the output of the previously computed JONSWAP spectrum. This number, which represents the area under the JONSWAP spectrum curve, is difficult to asses from the plot but it is necessary to compute the significant wave height from the spectrum, $H_{m0}$.
+\squeezeup
+\paragraph{2.b)} The significant wave height from the spectrum, $H_{m0}$, is found using the expression $H_{m0} = 4\sqrt{m_0}$. This results in a significant wave height of $H_{m0}=\SI{6.74}{m}$, representing a relative deviation of $\SI{-0.16}{\percent}$ from the initial significant wave height, $H_s=\SI{6.75}{m}$ (\cref{tab:Modelparameters}). The difference is attributed to the (pseudo-random) introduction of the phase components, $\delta_n$, which causes random wave interference. Thus, the JONSWAP spectrum seems to be implemented correctly. 
+
+\paragraph{2.c)} The specific implementation of the zero-down crossing analysis is summarised by the following three steps
+\begin{enumerate}
+    \item Identify zero-down crossings by checking: $\eta_{(i-1)}> 0$ and $\eta_{i} < 0$, for all $\eta_i$ and store indices
+    \item Perform linear interpolation of the wave periods to zero wave height
+    \item Find zero-down crossing wave heights: $H_k^{\text{zdc}}=\max(\eta_{j})-\min(\eta_{j})$, for $j$ going between all of the stored indices found in step 1.
+\end{enumerate}
+The significant wave height from the zero-down crossing analysis is then found by computing the mean of the 2/3 quantile, $q_{0.667}$, of the obtained zero down crossing wave heights. This results in a significant wave height of $H_s^{zdc}=\SI{6.56}{m}$, which gives a relative deviation of $\SI{-2.8}{\percent}$ from the input significant wave height (\cref{tab:Modelparameters}). \textcolor{red}{DISCUSS?}
+
+\paragraph{2.d)}
+
+\begin{figure}[htb]
+\begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth,frame,trim=-0.3cm -0.2cm -0.3cm -0.5cm, clip=true]{Figures/Illustrations/MechanicalModelling.eps}
+    \caption{Definition sketch of deformed system}
+    \label{fig:MechanicalModel}
+\end{subfigure}%
+\begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth,frame,trim=-0.2cm -0.2cm -0.25cm -0.5cm, clip=true]{Figures/Illustrations/MechanicalModellingFBD_v2.eps}
+    \caption{Free body diagram for each body}
+    \label{fig:MechanicalModelFBD}
+\end{subfigure}
 \end{figure}
