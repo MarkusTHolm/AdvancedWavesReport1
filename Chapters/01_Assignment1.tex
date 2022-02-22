@@ -81,11 +81,10 @@ Thus, the fourth step revolves around arranging the Fourier coefficients in the 
     d_{FFT}^\eta = [\, \Bar{\eta}\ d_1\ d_2\ \dots \ d_{(N_{Nyq}-1)} \ d_{N_{Nyq}} \ \Tilde{d}_{N_{Nyq}} \ \Tilde{d}_{(N_{Nyq}-1)} \ \dots \  \Tilde{d}_2 \ \Tilde{d}_1 \ \Bar{\eta} \, ], 
     \label{eq:dfftvector}
 \end{equation} 
-here $\Bar{\eta}$ is the mean wave height (set to zero) and $N_{Nyq}$ is the vector index of the Nyquist frequiency, $f_{Nyq}$. Finally, inserting the vector, $d_{FFT}^\eta$, into the \verb+ifft()+ function with the \verb+symmetric+ option enabled results in the surface elevation time series illustrated in \cref{fig:SurfaceElevation}. The free surface elevation looks reasonable as the waves  
-\\[15mm]
+here $\Bar{\eta}$ is the mean wave height (set to zero) and $N_{Nyq}$ is the vector index of the Nyquist frequiency, $f_{Nyq}$. Finally, inserting the vector, $d_{FFT}^\eta$, into the \verb+ifft()+ function with the \verb+symmetric+ option enabled results in the surface elevation time series illustrated in \cref{fig:SurfaceElevation}. The free surface elevation looks reasonable as the wave heights seems to be around the inserted significant wave height, $H_s=\SI{6.75}{m}$ (\cref{tab:Modelparameters}), with significant variations due to random wave interference.   
 
 
-\vspace{10mm}
+\vspace{15mm}
 {\let\clearpage\relax \chapter{Analyzing the implementation}}
 
 The purpose of the present section is to analyze the wave series generated from the wave characteristics and the JONSWAP spectrum (\cref{fig:SurfaceElevation}), with the goal of validating the implementation. The analysis is split into small steps following the order given in the problem description.
@@ -102,17 +101,11 @@ which evaluates to $m_0=\SI{2.84}{m^2}$ when applying the discrete formulation t
 \begin{enumerate}
     \item Identify zero-down crossings by checking: $\eta_{(i-1)}> 0$ and $\eta_{i} < 0$, for all $\eta_i$ and store indices
     \item Perform linear interpolation of the wave periods to zero wave height
-    \item Find zero-down crossing wave heights: $H_k^{\text{zdc}}=\max(\eta_{j})-\min(\eta_{j})$, for $j$ going through all of the stored indices found in step 1.
+    \item Find zero-down crossing wave heights: $H_k^{\text{zdc}}=\max(\eta_{j})-\min(\eta_{j})$, for $j$ going between all of the stored indices found in step 1.
 \end{enumerate}
-The significant wave height from the zero-down crossing analysis is then found by computing the mean of the 2/3 quantile, $q_{0.667}$, of the obtained zero down crossing wave heights. This results in a significant wave height of $H_s^{zdc}=\SI{6.56}{m}$, which gives a relative deviation of $\SI{-2.8}{\percent}$ from the input significant wave height (\cref{tab:Modelparameters}). \textcolor{red}{DISCUSS?}
+The significant wave height from the zero-down crossing analysis is then found by computing the mean of the 2/3 quantile, $q_{0.667}$, of the obtained zero down crossing wave heights. This results in a significant wave height of $H_s^{zdc}=\SI{6.56}{m}$, which gives a relative deviation of $\SI{-2.8}{\percent}$ from the input significant wave height (\cref{tab:Modelparameters}). It should be mentioned, that the rule-of-thumb relation between the statistical significant wave height and the zero-moment is $H_s\simeq(3.7 \text{ to 3.8})\sqrt{m_0}$, with $H_s$ trending towards $4\sqrt{m_0}$ for a narrow spectrum. Thus, as the present results corresponds to $H_s^{\text{zdc}}=3.89\sqrt{m_0}$, it can be concluded that the implementation seems to be correct and that the JONSWAP spectrum is relatively narrow, when using the specified model parameters.     
 
-\paragraph{2.d)} \Cref{fig:etaIFFTDistributions} illustrates the empirical distribution of the generated surface elevations (\cref{fig:SurfaceElevation}). \Cref{fig:etaIFFTHist} compares the empirical probalility density function with the equivalent normal distribution (based on the sample mean and sample variance), and \Cref{fig:etaIFFTqqplot} is a quantile-quantile plot (Q-Q plot) of the surface elevations versus the standard normal distribution. The figures generally illustrates good agreement with the expected normally distributed surface elevations. However, it is observed that there are some deviations from normality at the tails of the distribution (\cref{fig:etaIFFTqqplot}).\textcolor{red}{WHY does the surface elevation follow a normal distribution}. 
-
-To evaluate the distribution quantitatively, the skewness, $s_k$, and kurtosis, $k_u$, are computed and compared to the expected values for a normal distribution, i.e. $s_k=0$, and $k_u=3$. The skewness and kurtosis for the continuous case can be defined as
-\begin{equation}
-    s_k = \frac{1}{\sigma^3}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^3 \dif t, \quad k_u = \frac{1}{\sigma^4}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^4 \dif t.
-\end{equation}
-where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the variance of the surface elevation. Computing the skewness and kurtosis yields $s_k=-0.02$ and $k_u=2.92$, respectively. Hence, the surface elevation again seems to approximately follow a normal distribution.
+\paragraph{2.d)} \Cref{fig:etaIFFTDistributions} illustrates the empirical distribution of the generated surface elevations (\cref{fig:SurfaceElevation}). \Cref{fig:etaIFFTHist} compares the empirical probalility density function with the equivalent normal distribution (based on the sample mean and sample variance), and \Cref{fig:etaIFFTqqplot} is a quantile-quantile plot (Q-Q plot) of the surface elevations versus the standard normal distribution. The figures generally illustrates good agreement with the expected normally distributed surface elevations. However, it is observed that there are some deviations from normality at the tails of the distribution (\cref{fig:etaIFFTqqplot}).
 
 \begin{figure}[htb]
 \begin{subfigure}[t]{.5\textwidth}
@@ -131,20 +124,49 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 \label{fig:etaIFFTDistributions}
 \end{figure}
 
+
+To evaluate the distribution quantitatively, the skewness, $s_k$, and kurtosis, $k_u$, are computed and compared to the expected values for a normal distribution, i.e. $s_k=0$, and $k_u=3$. The skewness and kurtosis for the continuous case can be defined as
+\begin{equation}
+    s_k = \frac{1}{\sigma^3}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^3 \dif t, \quad k_u = \frac{1}{\sigma^4}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^4 \dif t.
+\end{equation}
+where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the variance of the surface elevation. Computing the skewness and kurtosis yields $s_k=-0.02$ and $k_u=2.92$, respectively. Hence, supporting the claim that the surface elevation seems to approximately follow a normal distribution.
+
+\paragraph{2.e)} \Cref{fig:etaHozvel} presents the Wheeler stretched horizontal velocity under the wave and its corresponding surface elevation, for five different points of an arbitrarily selected section of the wave series (\cref{fig:SurfaceElevation}). The plot illustrates the resulting velocity and surface elevation both for the full frequency spectrum (blue), and for an equivalent analysis using a cut-off frequency (red) of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or cut-off period $T_{\text{cut-off}}=\SI{4}{s}$). The details on how to implement the Wheeler stretching is not covered here, as it is a relatively simple procedure that is well described in the lecture slides. Furthermore, the effect of using a cut-off frequency is elaborated in Section 3.a).
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{Figures/Plots/etaHozvel.eps}
-    \caption{Illustration of the Wheeler stretched horizontal velocity, $u$, and corresponding surface elevation, $\eta$, under five different points of an arbitrary wave section from the series shown in \cref{fig:SurfaceElevation}. The blue curve illustrates the velocity and elevation for the full frequency range, and the red curve is based on a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$). }
+    \caption{Illustration of the Wheeler stretched horizontal velocity, $u$, and the corresponding surface elevation, $\eta$, under five different points of an arbitrary wave section from the series shown in \cref{fig:SurfaceElevation}. The blue curve illustrates the velocity and elevation for the full frequency range, and the red curve is based on a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$). }
     \label{fig:etaHozvel}
 \end{figure}
 
-\paragraph{2.e)} \cref{fig:etaHozvel} presents the horizontal velocity under the wave, for five different points of an arbitrary section of the wave series (\cref{fig:SurfaceElevation}). 
+The resulting horizontal velocity for the full frequency spectrum (blue), shows a negative velocity near the wave trough and positive velocity near the wave crest. Furthermore, the velocity magnitude increases monotonically from the seabed in all points, except for point 3. Thus, the horizontal velocity seems to agree with the expected behaviour from linear wave theory, except for point 3. The special behaviour of point 3 is due to the fact that resulting surface elevation is composed of many waves of different frequencies and thereby wavelengths. Hence, the high frequency (short wave length) wave components only contributes to the horizontal velocity near the water surface, while the low frequency components (long wave lengths) contribute to the velocity throughout the depth. Essentially, the high frequency components behave as deep water waves ($H/L>0.5$) and the low frequency components behave as shallow water waves ($H/L<0.05$). This, ultimately means that the low frequency components control the velocity near the surface, causing this seemingly unexpected behaviour of the depth variation of the horizontal velocity.
 
+However, it is evident from the results that filtering out (cutting off) the wave frequencies above a certain point removes the effect on the velocity of the very high frequency waves, with only minor changes to the resulting surface elevation. Although, the effect on the resulting surface elevation of using a cut-off frequency is much greater on the smaller waves, so the exact choice of cut-off frequency must be based on an individual assessment of the problem.
 
 \vspace{15mm}
 {\let\clearpage\relax \chapter{Extension to a directional spectrum}}
+The present section extends the previous analysis to a directional spectrum, where the employed wave spreading function, $D(\theta,s)$, is based on the suggestion of Longuet-Higgens (1961):
+\begin{equation}
+    D(\theta,s) = \frac{1}{\sqrt{\pi}}\frac{\Gamma(s+1)}{\Gamma(s+\frac{1}{2})}\cos^{2s}{(\theta-\theta_0)}, \quad \text{for } -\frac{\pi}{2}\leq \theta - \theta_0 \leq \frac{\pi}{2}
+\end{equation}
+where $\Gamma(\text{\scalebox{0.5}{\textbullet}})$ is the gamma function, $s$ is the wave spreading factor, $\theta$ is the angle to the direction and $\theta_0$ is the primary wave direction.
+\paragraph{3.a) } The implemented procedure to generate the surface elevation of an area of $\SI{300}{m}\times \SI{300}{m}$ can be summarised by the following steps
+\begin{enumerate}
+    \item Define spatial grid, which includes selecting the grid resolution (here selected as 50 grid points in each direction)
+    \item Define a list of direction angles $\theta_{\text{list}}$ and compute the corresponding cumulative probability density function, $P(\theta_{\text{list}})$, using a numerical integration scheme 
+    \item Uniformly draw a random number, $\psi_n$, between 0 and 1, and calculate the angle of each wave component, $\theta_n$, by interpolating $\psi_n$ between the values in $P(\theta_{\text{list}})$
+    \item Compute the directional wave numbers: $k_{nx}=k_n\cos{(\theta_n)}$, $k_{ny}=k_n\sin{(\theta_n)}$
+    \item Compute the complex conjugate pair of 2D directional wave Fourier coefficients, defined as $d_n=c_n e^{i(k_{nx}x+k_{ny}y) }$ and $\Tilde{d}_n=\Tilde{c_n} e^{-i(k_{nx}x+k_{ny}y) }$
+    \item Employ the previously explained Inverse Fast Fourier Transform (IFFT) method to obtain the surface elevations of the entire $\SI{300}{m}\times \SI{300}{m}$ area, i.e use the IFFT method in each of the grid points
+\end{enumerate}
+Here it should be mentioned the relation between the cumulative distribution function of the wave spreading function and the wave spreading function can be written as
+\begin{equation}
+    P(\theta_n) = \psi_n = \int_0^{\theta_n} D(\theta_n) \dif \theta 
+\end{equation}
+which explains the requirement of a numerical integration scheme in point 2. above. Further, the use of a list interpolation to compute the angles is merely a computational trick, to reduce the number of calls to the (expensive) numerical integration function.
 
-\paragraph{3.a) } 
+\Cref{fig:etaIFFTdirection} illustrates the resulting surface elevation at two times for the area of $\SI{300}{m}\times\SI{300}{m}$, both for the full frequency range and when using a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$). Comparing the results at the two different times, clearly illustrates the wave field primarily propagating in the positive $x$-direction, and to some extent in the directions near the positive $x$-direction. Hence, the directional wave spectrum seems to be implemented correctly. Furthermore, comparing the results from the full frequency range and when using a cut-off frequency shows that the cut-off frequency effectively removes the very small (perhaps unphysical) undulations.
 
 \begin{figure}[htb]
 \begin{subfigure}[t]{.5\textwidth}
