@@ -1,7 +1,7 @@
 \chapter{Implementation of the method for unidirectional waves}
 The present section gives a short introduction to the analysis method by presenting the utilized JONSWAP spectrum parameters, the definition of the Fourier series and the model parameters used in the report. 
 \section{Background}
-The JONSWAP spectrum is defined as
+The JONSWAP spectrum can be defined as
 \begin{subequations}
 \begin{equation}
     S_{\eta \eta}(f) = \alpha H_s^2 f_p^4 f^{-5} \gamma^\beta \exp{\left[-\frac{5}{4}\left(\frac{f_p}{f}\right)^4\right]}
@@ -18,7 +18,7 @@ The JONSWAP spectrum is defined as
 \end{equation}
 \label{eq:JONSWAP}
 \end{subequations}
-where \cref{eq:JONSWAPSpec} defines the power spectrum and \cref{eq:JONSWAPparam} defines the suggested scalar parameters given in the slides. Here, $H_s$ is the significant wave height, $f_p$ is the frequency corresponding to the peak period (i.e. $f_p=1/T_p$), $f$ is the frequency of interest, $\gamma$ is the so-called peak enhancement factor and $\alpha$, $\beta$, $\sigma$ are scalar parameters describing the shape of the JONSWAP spectrum. 
+where \cref{eq:JONSWAPSpec} defines the power spectrum and \cref{eq:JONSWAPparam} defines the suggested scalar parameters given in the lecture slides. Here, $H_s$ is the significant wave height, $f_p$ is the frequency corresponding to the peak period (i.e. $f_p=1/T_p$), $f$ is the frequency of interest, $\gamma$ is the so-called peak enhancement factor and $\alpha$, $\beta$, $\sigma$ are scalar parameters describing the shape of the JONSWAP spectrum. 
 
 The irregular wave series can be expressed using a Fourier series, where the standard Fourier representation can be written as
 \begin{equation}
@@ -29,8 +29,7 @@ here $a_n$ and $b_n$ are the unknown Fourier coefficients, and $\omega_n$, $T_n$
     \eta(t,x) = \sum_{n=1}^{n_{\text{max}}} c_n e^{-i(\omega_n t-k_n x)} + \Tilde{c}_n e^{i(\omega_n t - k_n x)}, \quad \text{where }c_n=\frac{1}{2}(a_n+i b_n) \ \text{and} \ \Tilde{c}_n=\frac{1}{2}(a_n-i b_n)
     \label{eq:ComplexFourier}
 \end{equation}
-which is valid as the function wave function, $\eta$, only has physical meaning for real values, i.e. $c_{-n}=\Tilde{c}_n$. \cref{eq:ComplexFourier} also shows the conversion between the real and complex Fourier coefficients. Note that the actual wave surface elevation is the real part of the above complex representation, and that the tilde $[\, \Tilde{\text{\scalebox{0.5}{\textbullet}}}\,]$ denotes the complex conjugate.
-
+which is valid as the function wave function, $\eta$, only has physical meaning for real values making it conjugate symmetric, i.e. $c_{-n}=\Tilde{c}_n$. \Cref{eq:ComplexFourier} also shows the conversion between the real and complex Fourier coefficients. Note that the actual wave surface elevation is the real part of the above complex representation, and that the tilde $[\, \Tilde{\text{\scalebox{0.5}{\textbullet}}}\,]$ denotes the complex conjugate.
 \begin{table}[h]
     \centering
     \caption{Model parameters (Group 10)}
@@ -49,24 +48,27 @@ which is valid as the function wave function, $\eta$, only has physical meaning 
     \label{tab:Modelparameters}
 \end{table}
 
+\Cref{tab:Modelparameters} presents the model paramaters used in the present report, which is based on the suggested numbers for group 10.
+
 \section{Implementation for unidirectional waves}
+The implementation of the irregular wave generation method for unidirectional waves is divided in four steps, and presented in the following.
 
 The first step in generating the wave time series is to compute the power spectrum, $S_{\eta \eta}(f)$, using the previously defined JONSWAP spectrum (\cref{eq:JONSWAP}). The JONSWAP spectrum is implemented into a MATLAB function denoted \verb+JONSWAP(Hs,fp,gam,fvec)+, which outputs the JONSWAP spectrum. The inputs are given (in order) as the significant wave height, the peak frequency, the peak enhancement factor and a vector containing the frequency discretization. The frequency discretization vector contains frequencies up to the Nyquist frequency, $f_{\text{Nyq}}(=\frac{1}{2dt})$, with the step size determined by the bandwidth of the frequency resolution, $df(=\frac{1}{t_{\text{dur}}})$, i.e. \verb+fvec+$=\{df\ 2df \ \dots \ f_{\text{Nyq}}\}^T$.
 
-Having obtained the power spectrum up until the Nyquist frequency, the second step is to provide an estimate for the phase shift of each component, $\delta_n$. As this is phase angle cannot be determined from the spectrum, $S_{\eta \eta}(f)$, the usual procedure is to assume that $\delta_n$ is a uniformly distributed stochastic variable over the interval $0<\delta_n\leq 2\pi$. The uniform distribution is achieved using the MATLAB intrinsic (pseudo) random number generator \verb+rand()+, with a fixed seed for reproducibility (seed=100).
+Having obtained the power spectrum up until the Nyquist frequency, the second step is to provide an estimate for the phase shift of each component, $\delta_n$. As this is phase angle cannot be determined from the spectrum, $S_{\eta \eta}(f)$, the usual procedure is to assume that $\delta_n$ is a uniformly distributed stochastic variable over the interval $0<\delta_n\leq 2\pi$. The uniform distribution is achieved using the MATLAB intrinsic (pseudo) random number generator \verb+rand()+, with a fixed seed for reproducibility (the seed is set to 100).
 
 The third step is to determine the complex conjugate pair of Fourier coefficients $\{c_n,\ \Tilde{c_n}\}$. This is achieved by first determining the real Fourier coefficients using the relations
 \begin{equation}
     A_n = \sqrt{2 S_{\eta \eta}(f_n)\,df}, \quad a_n=A_n\cos{(\delta_n)}, \quad b_n=A_n\sin{(\delta_n)}
 \end{equation}
-and then converting $\{a_n,\ b_n \}$ (using \cref{eq:ComplexFourier}) to the paired complex coefficients, $\{c_n,\ \Tilde{c}_n\}$.
+and then converting $\{a_n,\ b_n \}$ to the paired complex coefficients, $\{c_n,\ \Tilde{c}_n\}$, using the relations given in \cref{eq:ComplexFourier}.
 
-The fourth step is more easily understood when first introducing a new coefficient, $d_n$, such that \cref{eq:ComplexFourier} can be written as
+The fourth step is more easily understood when first introducing a new set of Fourier coefficients, $d_n$, such that \cref{eq:ComplexFourier} can be written as
 \begin{equation}
         \eta(t,x) = \sum_{n=1}^{n_{\text{max}}} d_n e^{-i\omega_n t} + \Tilde{d}_n e^{i\omega_n t}
     \label{eq:ComplexFourier2}, \quad d_n = c_n e^{ik_n x}, \qquad \Tilde{d}_n = \Tilde{c}_n e^{-ik_n x}.
 \end{equation}
-which is exactly what the Inverse Discrete Fourier Transform (IDFT) computes for a set of data points in a large matrix multiplication, requiring $O(n^2)$ multiplication operations. However, the computational efficiency can be greatly improved by using the Inverse Fast Fourier Transform (IFFT) that only requires $O(n\log{(n)})$ multiplication operations.
+which is exactly what the Inverse Discrete Fourier Transform (IDFT) computes for a set of data points in a large matrix multiplication, requiring $O(n^2)$ multiplication operations. However, the computational efficiency can be greatly improved by using the Inverse Fast Fourier Transform (IFFT) that only requires $O(n\log{(n)})$ multiplication operations, i.e. near linear scaling.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{Figures/Plots/SurfaceElevation.eps}
@@ -74,14 +76,16 @@ which is exactly what the Inverse Discrete Fourier Transform (IDFT) computes for
     \label{fig:SurfaceElevation}
 \end{figure}
 
-Thus, the fourth step revolves around arranging the Fourier coefficients in the correct order for the MATLAB IFFT algorithm, \verb+ifft()+. As previously mentioned, the desired discrete surface elevation function must only contain real values, making the coefficients conjugate symmetric ($c_{-n}=\Tilde{c}_n$). Thus, the coefficients, $d_n$, are also conjugate symmetric, and MATLAB requires the input vector to the \verb+ifft()+ function (here denoted $d_{FFT}^\eta$) to be stored in a \textit{wrap-around} order in the vector, such as
+Thus, the fourth step revolves around arranging the Fourier coefficients in the correct order for the MATLAB IFFT algorithm, \verb+ifft()+. As previously mentioned, the desired discrete surface elevation function must only contain real values, making the coefficients conjugate symmetric ($c_{-n}=\Tilde{c}_n$). Hence, the new coefficients, $d_n$, are also conjugate symmetric, and MATLAB requires the input vector to the \verb+ifft()+ function (here denoted $d_{FFT}^\eta$) to be stored in a \textit{wrap-around} order, such as
 \begin{equation}
     d_{FFT}^\eta = [\, \Bar{\eta}\ d_1\ d_2\ \dots \ d_{(N_{Nyq}-1)} \ d_{N_{Nyq}} \ \Tilde{d}_{N_{Nyq}} \ \Tilde{d}_{(N_{Nyq}-1)} \ \dots \  \Tilde{d}_2 \ \Tilde{d}_1 \ \Bar{\eta} \, ], 
     \label{eq:dfftvector}
 \end{equation} 
-here $\Bar{\eta}$ is the mean wave height (set to zero) and $N_{Nyq}$ is the index of the Nyquist frequiency, $f_{Nyq}$. Finally, inserting the vector, $d_{FFT}^\eta$, into the \verb+ifft()+ function with the \verb+symmetric+ option enabled results in the surface elevation time series illustrated in \cref{fig:SurfaceElevation}. 
+here $\Bar{\eta}$ is the mean wave height (set to zero) and $N_{Nyq}$ is the vector index of the Nyquist frequiency, $f_{Nyq}$. Finally, inserting the vector, $d_{FFT}^\eta$, into the \verb+ifft()+ function with the \verb+symmetric+ option enabled results in the surface elevation time series illustrated in \cref{fig:SurfaceElevation}. The free surface elevation looks reasonable as the waves  
+\\[15mm]
 
-\vspace{15mm}
+
+\vspace{10mm}
 {\let\clearpage\relax \chapter{Analyzing the implementation}}
 
 The purpose of the present section is to analyze the wave series generated from the wave characteristics and the JONSWAP spectrum (\cref{fig:SurfaceElevation}), with the goal of validating the implementation. The analysis is split into small steps following the order given in the problem description.
@@ -142,8 +146,6 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 
 \paragraph{3.a) } 
 
-\paragraph{3.b) } Distribution of surfaces: Full frequency skewness $s_k=0.02$, kurtosis $k_{u}=2.96$ Cut-off skewness $s_{k,\text{cut-off}}=0.02$ kurtosis $k_{u,\text{cut-off}}=2.94$
-
 \begin{figure}[htb]
 \begin{subfigure}[t]{.5\textwidth}
     \centering
@@ -171,4 +173,24 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 \end{subfigure}
 \caption{Surface elevation at two times for an area of $\SI{300}{m}\times\SI{300}{m}$, for the full frequency range and when using a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$).}
 \label{fig:etaIFFTdirection}
+\end{figure}
+
+\paragraph{3.b) } Distribution of surfaces: Full frequency skewness $s_k=0.02$, kurtosis $k_{u}=2.96$ Cut-off skewness $s_{k,\text{cut-off}}=0.02$ kurtosis $k_{u,\text{cut-off}}=2.94$
+
+
+\begin{figure}[htb]
+\begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=.95\textwidth,trim=0cm 0cm 0.0cm 0cm, clip=true]{Figures/Plots/etaIFFTdistdir.eps}
+    \caption{Full frequency spectrum}
+    \label{fig:etaIFFTHistdir}
+\end{subfigure}%
+\begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth,trim=0cm 0cm 0cm 0cm, clip=true]{Figures/Plots/etaIFFTdistdircut.eps}
+    \caption{Cut-off frequency spectrum}
+    \label{fig:etaIFFTHistdircut}
+\end{subfigure}
+\caption{Empirical probability distribution functions for the generated directional surface elevations, $\eta$, at the center of the area shown in \cref{fig:etaIFFTdirection} ($x=\SI{150}{m}$, $y=\SI{150}{m}$). The distributions are shown for the full frequency range and when using a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$).}
+\label{fig:etaIFFTdirDistributions}
 \end{figure}
