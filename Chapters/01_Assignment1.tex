@@ -1,5 +1,5 @@
 \chapter{Implementation of the method for unidirectional waves}
-
+The present section gives a short introduction to the analysis method by presenting the utilized JONSWAP spectrum parameters, the definition of the Fourier series and the model parameters used in the report. 
 \section{Background}
 The JONSWAP spectrum is defined as
 \begin{subequations}
@@ -13,7 +13,7 @@ The JONSWAP spectrum is defined as
     \begin{cases}
     0.07, \quad \text{for }f\leq f_p \\
     0.09, \quad \text{for }f> f_p
-    \end{cases}
+    \end{cases},
     \label{eq:JONSWAPparam}
 \end{equation}
 \label{eq:JONSWAP}
@@ -70,7 +70,7 @@ which is exactly what the Inverse Discrete Fourier Transform (IDFT) computes for
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{Figures/Plots/SurfaceElevation.eps}
-    \caption{Free surface elevation as a function of time}
+    \caption{Free surface elevation as a function of time, $\eta(t)$, generated from the JONSWAP spectrum using the Fast Fourier Transform (FFT) method.}
     \label{fig:SurfaceElevation}
 \end{figure}
 
@@ -108,7 +108,7 @@ To evaluate the distribution quantitatively, the skewness, $s_k$, and kurtosis, 
 \begin{equation}
     s_k = \frac{1}{\sigma^3}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^3 \dif t, \quad k_u = \frac{1}{\sigma^4}\frac{1}{T_0}\int_0^{T_0} (\eta(t)-\Bar{\eta})^4 \dif t.
 \end{equation}
-where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the variance of the surface elevation. Computing the skewness and kurtosis yields $s_k=-0.02$ and $k_u=2.92$, respectively. Thus, surface elevation again seems to approximately follow a normal distribution.
+where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the variance of the surface elevation. Computing the skewness and kurtosis yields $s_k=-0.02$ and $k_u=2.92$, respectively. Hence, the surface elevation again seems to approximately follow a normal distribution.
 
 \begin{figure}[htb]
 \begin{subfigure}[t]{.5\textwidth}
@@ -129,7 +129,15 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{Figures/Plots/etaHozvel.eps}
-    \caption{Horizontal velocity}
+    \includegraphics[width=0.7\textwidth]{Figures/Plots/etaHozvel.eps}
+    \caption{Illustration of the Wheeler stretched horizontal velocity, $u$, under five different points of an arbitrary wave section from the series shown in \cref{fig:SurfaceElevation}.}
     \label{fig:etaHozvel}
 \end{figure}
+
+\paragraph{2.e)} \cref{fig:etaHozvel} presents the horizontal velocity under the wave, for five different points of an arbitrary section of the wave series (\cref{fig:SurfaceElevation}). 
+
+
+\vspace{15mm}
+{\let\clearpage\relax \chapter{Extension to a directional spectrum}}
+
+bla bla
