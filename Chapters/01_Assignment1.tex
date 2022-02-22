@@ -98,7 +98,7 @@ which evaluates to $m_0=\SI{2.84}{m^2}$ when applying the discrete formulation t
 \begin{enumerate}
     \item Identify zero-down crossings by checking: $\eta_{(i-1)}> 0$ and $\eta_{i} < 0$, for all $\eta_i$ and store indices
     \item Perform linear interpolation of the wave periods to zero wave height
-    \item Find zero-down crossing wave heights: $H_k^{\text{zdc}}=\max(\eta_{j})-\min(\eta_{j})$, for $j$ going between all of the stored indices found in step 1.
+    \item Find zero-down crossing wave heights: $H_k^{\text{zdc}}=\max(\eta_{j})-\min(\eta_{j})$, for $j$ going through all of the stored indices found in step 1.
 \end{enumerate}
 The significant wave height from the zero-down crossing analysis is then found by computing the mean of the 2/3 quantile, $q_{0.667}$, of the obtained zero down crossing wave heights. This results in a significant wave height of $H_s^{zdc}=\SI{6.56}{m}$, which gives a relative deviation of $\SI{-2.8}{\percent}$ from the input significant wave height (\cref{tab:Modelparameters}). \textcolor{red}{DISCUSS?}
 
@@ -129,8 +129,8 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.7\textwidth]{Figures/Plots/etaHozvel.eps}
-    \caption{Illustration of the Wheeler stretched horizontal velocity, $u$, under five different points of an arbitrary wave section from the series shown in \cref{fig:SurfaceElevation}.}
+    \includegraphics[width=0.8\textwidth]{Figures/Plots/etaHozvel.eps}
+    \caption{Illustration of the Wheeler stretched horizontal velocity, $u$, and corresponding surface elevation, $\eta$, under five different points of an arbitrary wave section from the series shown in \cref{fig:SurfaceElevation}. The blue curve illustrates the velocity and elevation for the full frequency range, and the red curve is based on a cut off frequency of $f_{\text{cut-off}}=\SI{0.33}{Hz}$ (or period $T_{\text{cut-off}}=\SI{3}{s}$). }
     \label{fig:etaHozvel}
 \end{figure}
 
@@ -144,27 +144,27 @@ where $\Bar{\eta}$ is the mean of the surface elevation, and $\sigma$ is the var
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=.95\textwidth,trim=0cm 0cm 0.0cm 0cm, clip=true]{Figures/Plots/etadirns1.eps}
-    \caption{No cut-off frequency $t=\SI{50}{s}$}
+    \caption{Full frequency range at $t=\SI{50}{s}$}
     \label{fig:etaIFFTdirns1}
 \end{subfigure}%
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth,trim=0cm 0cm 0cm 0cm, clip=true]{Figures/Plots/etadirns2.eps}
-    \caption{No cut-off frequency $t=\SI{55}{s}$}
+    \caption{Full frequency range at $t=\SI{55}{s}$}
     \label{fig:etaIFFTdirns2}
 \end{subfigure}
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=.95\textwidth,trim=0cm 0cm 0.0cm 0cm, clip=true]{Figures/Plots/etadir1.eps}
-    \caption{With cut-off frequency $t=\SI{50}{s}$}
+    \caption{With cut-off frequency at $t=\SI{50}{s}$}
     \label{fig:etaIFFTdir1}
 \end{subfigure}%
 \begin{subfigure}[t]{.5\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth,trim=0cm 0cm 0cm 0cm, clip=true]{Figures/Plots/etadir2.eps}
-    \caption{With cut-off frequency $t=\SI{55}{s}$}
+    \caption{With cut-off frequency at $t=\SI{55}{s}$}
     \label{fig:etaIFFTdir2}
 \end{subfigure}
-\caption{Surface elevation at two times for an area of $\SI{300}{m}\times\SI{300}{m}$, with and without using a cut-off frequency of $f_{\text{cut-off}}=\SI{0.25}{Hz}$ (or period $T_{\text{cut-off}}=\SI{4}{s}$).}
+\caption{Surface elevation at two times for an area of $\SI{300}{m}\times\SI{300}{m}$, with and without using a cut-off frequency of $f_{\text{cut-off}}=\SI{0.33}{Hz}$ (or period $T_{\text{cut-off}}=\SI{3}{s}$).}
 \label{fig:etaIFFTdirection}
 \end{figure}
